@@ -1,7 +1,7 @@
 package com.orange.mo.config;
 
-import com.orange.mo.common.jwt.JwtIgnore;
 import com.orange.mo.common.jwt.CurrentUserHelder;
+import com.orange.mo.common.jwt.JwtIgnore;
 import com.orange.mo.exception.BusinessException;
 import com.orange.mo.utils.JwtTokenUtil;
 import org.springframework.http.HttpMethod;
@@ -19,9 +19,8 @@ public class JWTInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 从http请求头中取出token
         final String token = request.getHeader(JwtTokenUtil.AUTH_HEADER_KEY);
-
         //如果不是映射到方法，直接通过
-        if(!(handler instanceof HandlerMethod)){
+        if (!(handler instanceof HandlerMethod)) {
             return true;
         }
         //如果是方法探测，直接通过
@@ -31,19 +30,18 @@ public class JWTInterceptor implements HandlerInterceptor {
         }
         //如果方法有JwtIgnore注解，直接通过
         HandlerMethod handlerMethod = (HandlerMethod) handler;
-        Method method=handlerMethod.getMethod();
+        Method method = handlerMethod.getMethod();
         if (method.isAnnotationPresent(JwtIgnore.class)) {
             JwtIgnore jwtIgnore = method.getAnnotation(JwtIgnore.class);
-            if(jwtIgnore.value()){
+            if (jwtIgnore.value()) {
                 return true;
             }
         }
-        if(StringUtils.isEmpty(token)){
-            throw new BusinessException("token为空，鉴权失败！");
+        if (StringUtils.isEmpty(token)) {
+            throw new BusinessException("凭证不能为空!");
         }
         //验证，并获取token内部信息
         String userToken = JwtTokenUtil.verifyToken(token);
-
         //将token放入本地缓存
         CurrentUserHelder.setUserToken(userToken);
         return true;

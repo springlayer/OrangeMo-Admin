@@ -37,7 +37,7 @@ public class LoginController {
         if (result != null) {
             return R.data(JwtTokenUtil.createToken(result));
         } else {
-            throw new BusinessException("账号或密码错误！");
+            throw new BusinessException("账号或密码错误");
         }
     }
 

@@ -75,4 +75,9 @@ public class SysUser {
         this.loginName = loginName;
         this.password = password;
     }
+
+    public static boolean isAdmin(Long userId)
+    {
+        return userId != null && 1L == userId;
+    }
 }

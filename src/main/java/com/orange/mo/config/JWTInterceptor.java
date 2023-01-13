@@ -2,6 +2,7 @@ package com.orange.mo.config;
 
 import com.orange.mo.common.jwt.CurrentUserHelder;
 import com.orange.mo.common.jwt.JwtIgnore;
+import com.orange.mo.exception.AuthException;
 import com.orange.mo.exception.BusinessException;
 import com.orange.mo.utils.JwtTokenUtil;
 import org.springframework.http.HttpMethod;
@@ -38,7 +39,7 @@ public class JWTInterceptor implements HandlerInterceptor {
             }
         }
         if (StringUtils.isEmpty(token)) {
-            throw new BusinessException("凭证不能为空!");
+            throw new AuthException("凭证不能为空!");
         }
         //验证，并获取token内部信息
         String userToken = JwtTokenUtil.verifyToken(token);

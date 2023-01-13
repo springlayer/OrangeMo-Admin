@@ -101,6 +101,13 @@ public class ServiceRestExceptionTranslator {
         return R.fail(e.getResultCode(), e.getMessage());
     }
 
+    @ExceptionHandler(AuthException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public R handleError(AuthException e) {
+        log.error(e.getMessage());
+        return R.fail(e.getResultCode(), e.getMessage());
+    }
+
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public R handleError(Throwable e) {

@@ -6,7 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.orange.mo.admin.domain.SysUser;
-import com.orange.mo.exception.BusinessException;
+import com.orange.mo.exception.AuthException;
 
 import java.util.Date;
 
@@ -50,9 +50,9 @@ public class JwtTokenUtil {
                     .verify(token.replace(TOKEN_PREFIX, ""))
                     .getSubject();
         } catch (TokenExpiredException e) {
-            throw new BusinessException("token已失效，请重新登录");
+            throw new AuthException("token已失效，请重新登录");
         } catch (JWTVerificationException e) {
-            throw new BusinessException("token验证失败！");
+            throw new AuthException("token验证失败！");
         }
     }
 }

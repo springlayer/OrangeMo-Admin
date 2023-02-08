@@ -1,5 +1,10 @@
 package com.orange.mo.admin.enums;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author zhihou
  * @date 2020/12/16 17:32
@@ -8,50 +13,52 @@ package com.orange.mo.admin.enums;
  * 0启用 1禁用
  * 0展示 1隐藏
  */
-public enum StatusEnum {
+public enum MenuTypeEnum {
 
-    YES("是", 1) {
-        @Override
-        public boolean isYes() {
-            return true;
-        }
+    M("目录", "M") {
     },
-    NOT("否", 0) {
-        @Override
-        public boolean isNo() {
-            return true;
-        }
+    C("菜单", "C") {
+    },
+    F("按钮", "F") {
     };
 
-    public Integer value() {
+    public String value() {
         return value;
     }
 
-    public static StatusEnum value(Integer value) {
+    public static List<String> addMandC() {
+        List<String> objects = new ArrayList<>();
+        objects.add(MenuTypeEnum.M.getValue());
+        objects.add(MenuTypeEnum.C.getValue());
+        return objects;
+    }
+
+    public static MenuTypeEnum value(String value) {
         switch (value) {
-            case 1:
-                return YES;
-            case 0:
-                return NOT;
+            case "M":
+                return M;
+            case "C":
+                return C;
+            case "F":
+                return F;
         }
         return null;
     }
 
     private String name;
 
-    private Integer value;
+    private String value;
 
-    StatusEnum(String name, Integer value) {
+    MenuTypeEnum(String name, String value) {
         this.name = name;
         this.value = value;
     }
 
-    public boolean isYes() {
-        return false;
+    public String getName() {
+        return name;
     }
 
-    public boolean isNo() {
-        return false;
+    public String getValue() {
+        return value;
     }
-
 }

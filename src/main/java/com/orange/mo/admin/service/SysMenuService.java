@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.orange.mo.admin.beans.Ztree;
 import com.orange.mo.admin.domain.SysMenu;
 import com.orange.mo.admin.domain.SysUser;
+import com.orange.mo.admin.enums.MenuTypeEnum;
+import com.orange.mo.admin.enums.StatusEnum;
 import com.orange.mo.admin.mapper.SysMenuMapper;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +39,7 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
     public List<SysMenu> selectMenuAll(Long userId) {
         List<SysMenu> menuList = null;
         if (SysUser.isAdmin(userId)) {
-            menuList = this.list();
+            menuList = this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuType, MenuTypeEnum.addMandC()));
         } else {
             menuList = this.selectMenuAllByUserId(userId);
         }
@@ -47,6 +49,6 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
     private List<SysMenu> selectMenuAllByUserId(Long userId) {
         List<Long> roles = sysUserRoleService.getUserMenuTreeData(userId);
         List<Long> menuIds = sysRoleMenuService.getMenuIdsByRoles(roles);
-        return this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuId, menuIds));
+        return this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuId, menuIds).in(SysMenu::getMenuType, MenuTypeEnum.addMandC()));
     }
 }

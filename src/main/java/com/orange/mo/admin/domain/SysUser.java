@@ -13,6 +13,11 @@ public class SysUser {
     private Long userId;
 
     /**
+     * 部门ID
+     */
+    private Long deptId;
+
+    /**
      * 登录名称
      */
     private String loginName;
@@ -35,7 +40,7 @@ public class SysUser {
     /**
      * 手机号码
      */
-    private String phonenumber;
+    private String phone;
 
     /**
      * 用户性别
@@ -76,8 +81,7 @@ public class SysUser {
         this.password = password;
     }
 
-    public static boolean isAdmin(Long userId)
-    {
+    public static boolean isAdmin(Long userId) {
         return userId != null && 1L == userId;
     }
 }

@@ -17,6 +17,8 @@
         <lombok.version>1.18.20</lombok.version>
         <jwt.version>3.15.0</jwt.version>
         <fast-json.version>1.2.46</fast-json.version>
+        <commons.fileupload.version>1.4</commons.fileupload.version>
+        <commons.lang3.version>3.9</commons.lang3.version>
     </properties>
 
     <dependencies>
@@ -55,6 +57,18 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>${fast-json.version}</version>
+        </dependency>
+        <!-- 文件上传工具类 -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>${commons.fileupload.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang3.version}</version>
         </dependency>
     </dependencies>
     <build>

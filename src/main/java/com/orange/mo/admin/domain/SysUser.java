@@ -1,9 +1,14 @@
 package com.orange.mo.admin.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName(value = "sys_user")
 public class SysUser {
 
@@ -16,6 +21,12 @@ public class SysUser {
      * 部门ID
      */
     private Long deptId;
+
+    /**
+     * 部门名称
+     */
+    @TableField(exist = false)
+    private String deptName;
 
     /**
      * 登录名称
@@ -70,7 +81,7 @@ public class SysUser {
     /**
      * 删除标志（0代表存在 2代表删除）
      */
-    private String delFlag;
+    private Boolean delFlag;
 
     private String remark;
 
@@ -84,4 +95,9 @@ public class SysUser {
     public static boolean isAdmin(Long userId) {
         return userId != null && 1L == userId;
     }
+
+    public void buildDelUser(SysUser sysUser) {
+        sysUser.setDelFlag(true);
+    }
+
 }

@@ -28,4 +28,19 @@ public class SysUserController {
                                               @RequestParam(value = "phone", required = false) String phone, @RequestParam(value = "deptId", required = true) Long deptId) {
         return R.data(sysUserService.querySysUserPage(current, size, username, phone, deptId));
     }
+
+    @GetMapping(value = "/remove")
+    public R removeSysUser(@RequestParam(value = "userId") String userId) {
+        return R.status(sysUserService.removeSysUser(userId));
+    }
+
+    @PostMapping(value = "/createOrUpdate")
+    public R createSysUser(@RequestBody SysUser sysUser) {
+        return R.status(sysUserService.createSysUser(sysUser));
+    }
+
+    @GetMapping(value = "/detail")
+    public R<SysUser> sysUserDetail(@RequestParam(value = "userId") String userId) {
+        return R.data(sysUserService.sysUserDetail(userId));
+    }
 }

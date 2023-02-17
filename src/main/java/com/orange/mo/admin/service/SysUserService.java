@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.orange.mo.admin.constant.ComConstant;
 import com.orange.mo.admin.domain.SysDept;
 import com.orange.mo.admin.domain.SysUser;
+import com.orange.mo.admin.domain.bo.ReSetPwd;
 import com.orange.mo.admin.domain.bo.SysUserDeptBo;
 import com.orange.mo.admin.enums.StatusEnum;
 import com.orange.mo.admin.enums.UserTypeEnum;
@@ -73,10 +74,19 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
             return this.save(sysUser);
         } else {
             SysUser one = this.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getPhone, sysUser.getPhone()).eq(SysUser::getDelFlag, false));
-            if (!one.getPhone().equals(sysUser.getPhone())) {
+            if (null != one && !one.getPhone().equals(sysUser.getPhone())) {
                 throw new BusinessException("手机号重复");
             }
         }
+        return this.update(sysUser, Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getUserId, sysUser.getUserId()));
+    }
+
+    public Boolean reSetPwd(ReSetPwd reSetPwd, Long userId) {
+        SysUser sysUser = this.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getUserId, userId));
+        if (!sysUser.getPassword().equals(reSetPwd.getOldPassword())) {
+            throw new BusinessException("原密码不正确");
+        }
+        sysUser.setPassword(reSetPwd.getNewPassword());
         return this.update(sysUser, Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getUserId, sysUser.getUserId()));
     }
 }

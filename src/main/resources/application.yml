@@ -1,5 +1,5 @@
 orangemo:
-  profile: /home/project/orangemo/
+  profile: /data/www/orangemo/
 #  profile: E:/orangemo/uploadPath
   ignores: /file/common/upload,/login
 server:

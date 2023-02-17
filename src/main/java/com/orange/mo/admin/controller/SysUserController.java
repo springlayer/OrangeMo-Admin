@@ -1,6 +1,7 @@
 package com.orange.mo.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.orange.mo.admin.domain.SysUser;
 import com.orange.mo.admin.service.SysUserService;
 import com.orange.mo.common.api.R;
@@ -19,8 +20,10 @@ public class SysUserController {
 
     @GetMapping("/info")
     @ResponseBody
-    public R<CurrentUser> info() {
-        return R.data(CurrentUserHelder.currentUser());
+    public R<SysUser> info() {
+        CurrentUser currentUser = CurrentUserHelder.currentUser();
+        SysUser one = sysUserService.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getUserId, currentUser.getUserId()));
+        return R.data(one);
     }
 
     @GetMapping(value = "/query/page")
@@ -35,6 +38,7 @@ public class SysUserController {
     }
 
     @PostMapping(value = "/createOrUpdate")
+    @ResponseBody
     public R createSysUser(@RequestBody SysUser sysUser) {
         return R.status(sysUserService.createSysUser(sysUser));
     }

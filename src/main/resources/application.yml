@@ -1,7 +1,7 @@
 orangemo:
   profile: /data/www/orangemo/
 #  profile: E:/orangemo/uploadPath
-  ignores: /login,/druid/index.html
+  ignores: /login
 server:
   port: 8080
 spring:

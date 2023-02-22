@@ -2,6 +2,7 @@ package com.orange.mo.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.orange.mo.admin.domain.SysRole;
+import com.orange.mo.admin.domain.SysUser;
 import com.orange.mo.admin.service.SysRoleService;
 import com.orange.mo.common.api.R;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +16,14 @@ public class SysRoleController {
     @Resource
     private SysRoleService sysRoleService;
 
-
     @GetMapping(value = "/query/page")
     public R<IPage<SysRole>> querySysRolePage(@RequestParam(value = "current", required = true, defaultValue = "1") Integer current, @RequestParam(value = "size", required = true, defaultValue = "10") Integer size, @RequestParam(value = "roleName", required = false) String roleName) {
         return R.data(sysRoleService.querySysUserPage(current, size, roleName));
+    }
+
+    @GetMapping(value = "/query/page/in/user")
+    public R<IPage<SysUser>> querySysUserInRoleIdPage(@RequestParam(value = "current", required = true, defaultValue = "1") Integer current, @RequestParam(value = "size", required = true, defaultValue = "10") Integer size, @RequestParam(value = "roleId") String roleId) {
+        return R.data(sysRoleService.querySysUserInRoleIdPage(current, size, roleId));
     }
 
     @GetMapping(value = "/remove")
@@ -40,5 +45,10 @@ public class SysRoleController {
     @PostMapping(value = "/acl")
     public R sysSysRoleAcl(@RequestBody SysRole sysRole) {
         return R.data(sysRoleService.sysSysRoleAcl(sysRole));
+    }
+
+    @GetMapping(value = "/remove/user")
+    public R removeSysUserRoleAcl(@RequestParam("userId") String userId, @RequestParam("roleId") String roleId) {
+        return R.status(sysRoleService.removeSysUserRoleAcl(userId, roleId));
     }
 }

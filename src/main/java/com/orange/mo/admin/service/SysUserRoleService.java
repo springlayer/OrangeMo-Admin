@@ -34,4 +34,12 @@ public class SysUserRoleService extends ServiceImpl<SysUserRoleMapper, SysUserRo
     public void removeByRoleId(String roleId) {
         this.remove(Wrappers.lambdaQuery(SysUserRole.class).eq(SysUserRole::getRoleId, Long.valueOf(roleId)));
     }
+
+    public List<Long> selectSysUserIdsByRoleId(String roleId) {
+        return this.list(Wrappers.lambdaQuery(SysUserRole.class).eq(SysUserRole::getRoleId, roleId)).stream().map(sysUserRole -> sysUserRole.getUserId()).collect(Collectors.toList());
+    }
+
+    public Boolean removeByUserIdAndRoleId(String userId, String roleId) {
+        return this.remove(Wrappers.lambdaQuery(SysUserRole.class).eq(SysUserRole::getRoleId, roleId).eq(SysUserRole::getUserId, userId));
+    }
 }

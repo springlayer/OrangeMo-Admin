@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Service
@@ -36,7 +37,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
 
     public IPage<SysUser> querySysUserPage(Integer current, Integer size, String username, String phone, Long deptId) {
         Page<SysUser> page = new Page<SysUser>(current, size);
-        SysUserDeptBo sysUserDeptBo = new SysUserDeptBo(username, phone, deptId,UserTypeEnum.SYS_USER.getValue());
+        SysUserDeptBo sysUserDeptBo = new SysUserDeptBo(username, phone, deptId, UserTypeEnum.SYS_USER.getValue());
         IPage<SysUser> sysUserIPage = sysUserMapper.iPageSelect(page, sysUserDeptBo);
         if (StringUtils.isEmpty(sysUserIPage)) {
             return new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
@@ -88,5 +89,9 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
         }
         sysUser.setPassword(reSetPwd.getNewPassword());
         return this.update(sysUser, Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getUserId, sysUser.getUserId()));
+    }
+
+    public IPage<SysUser> querySysUserPageByUserIds(Page page, List<Long> userIds) {
+        return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).in(SysUser::getUserId, userIds));
     }
 }

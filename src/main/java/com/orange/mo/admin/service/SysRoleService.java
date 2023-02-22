@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.orange.mo.admin.domain.SysRole;
 import com.orange.mo.admin.domain.SysRoleMenu;
+import com.orange.mo.admin.domain.SysUser;
 import com.orange.mo.admin.enums.StatusEnum;
 import com.orange.mo.admin.mapper.SysRoleMapper;
 import com.orange.mo.exception.BusinessException;
@@ -22,16 +23,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
-
     @Resource
     private SysRoleMapper sysRoleMapper;
-
     @Resource
     private SysUserRoleService sysUserRoleService;
     @Resource
     private SysRoleMenuService sysRoleMenuService;
     @Resource
     private SysRoleDeptService sysRoleDeptService;
+    @Resource
+    private SysUserService sysUserService;
+
 
     public IPage<SysRole> querySysUserPage(Integer current, Integer size, String roleName) {
         Page page = new Page(current, size);
@@ -46,7 +48,7 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
         List<SysRole> records = data.getRecords();
         for (SysRole sysRole : records) {
             List<SysRoleMenu> sysRoleMenus = longListMap.get(sysRole.getRoleId());
-            if(!ObjectUtils.isEmpty(sysRoleMenus)){
+            if (!ObjectUtils.isEmpty(sysRoleMenus)) {
                 List<Long> collect = sysRoleMenus.stream().map(sysRoleMenu -> sysRoleMenu.getMenuId()).collect(Collectors.toList());
                 sysRole.setMenuIds(collect.stream().toArray(Long[]::new));
             }
@@ -101,5 +103,18 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
     public Boolean sysSysRoleAcl(SysRole sysRole) {
         sysRoleMenuService.removeByRoleId(sysRole.getRoleId().toString());
         return sysRoleMenuService.addSysRoleAcl(sysRole);
+    }
+
+    public IPage<SysUser> querySysUserInRoleIdPage(Integer current, Integer size, String roleId) {
+        Page page = new Page(current, size);
+        List<Long> userIds = sysUserRoleService.selectSysUserIdsByRoleId(roleId);
+        if (ObjectUtils.isEmpty(userIds)) {
+            return page;
+        }
+        return sysUserService.querySysUserPageByUserIds(page, userIds);
+    }
+
+    public Boolean removeSysUserRoleAcl(String userId, String roleId) {
+        return sysUserRoleService.removeByUserIdAndRoleId(userId, roleId);
     }
 }

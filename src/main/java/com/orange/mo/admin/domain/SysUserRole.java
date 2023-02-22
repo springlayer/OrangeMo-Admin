@@ -1,5 +1,6 @@
 package com.orange.mo.admin.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -9,10 +10,12 @@ public class SysUserRole {
     /**
      * 用户ID
      */
+    @TableField("user_id")
     private Long userId;
 
     /**
      * 角色ID
      */
+    @TableField("role_id")
     private Long roleId;
 }

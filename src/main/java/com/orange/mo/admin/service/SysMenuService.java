@@ -19,8 +19,16 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
     @Resource
     private SysRoleMenuService sysRoleMenuService;
 
-    public List<SysMenu> menuTreeData(Long userId) {
+    public List<SysMenu> userMenuTreeData(Long userId) {
         List<SysMenu> menuList = selectMenuAll(userId);
+        return menuList.stream()
+                .filter(m -> m.getParentId() == 0)
+                .peek(m -> m.setChildren(getChildren(m, menuList)))
+                .collect(Collectors.toList());
+    }
+
+    public List<SysMenu> menuTreeData() {
+        List<SysMenu> menuList = this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuType, MenuTypeEnum.addMandC()).orderByAsc(SysMenu::getOrderNum));
         return menuList.stream()
                 .filter(m -> m.getParentId() == 0)
                 .peek(m -> m.setChildren(getChildren(m, menuList)))
@@ -49,4 +57,5 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
         List<Long> menuIds = sysRoleMenuService.getMenuIdsByRoles(roles);
         return this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuId, menuIds).in(SysMenu::getMenuType, MenuTypeEnum.addMandC()));
     }
+
 }

@@ -10,21 +10,26 @@ package com.orange.mo.admin.enums;
  */
 public enum UserTypeEnum {
 
-    SYS_USER("系统用户", 00) {
+    SYS_USER("系统用户", "00") {
     },
-    REGISTER_USER("注册用户", 01) {
-    };
+    REGISTER_USER("注册用户", "01") {
+    },
+    ADMIN("超级管理员用户", "0_0") {
+    },
+    ;
 
-    public Integer value() {
+    public String value() {
         return value;
     }
 
 
-    public static UserTypeEnum value(Integer value) {
+    public static UserTypeEnum value(String value) {
         switch (value) {
-            case 00:
+            case "0_0":
+                return ADMIN;
+            case "00":
                 return SYS_USER;
-            case 01:
+            case "01":
                 return REGISTER_USER;
         }
         return null;
@@ -32,9 +37,9 @@ public enum UserTypeEnum {
 
     private String name;
 
-    private Integer value;
+    private String value;
 
-    UserTypeEnum(String name, Integer value) {
+    UserTypeEnum(String name, String value) {
         this.name = name;
         this.value = value;
     }
@@ -43,7 +48,7 @@ public enum UserTypeEnum {
         return name;
     }
 
-    public Integer getValue() {
+    public String getValue() {
         return value;
     }
 }

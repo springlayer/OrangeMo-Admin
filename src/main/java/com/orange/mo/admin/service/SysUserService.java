@@ -36,7 +36,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
 
     public IPage<SysUser> querySysUserPage(Integer current, Integer size, String username, String phone, Long deptId) {
         Page<SysUser> page = new Page<SysUser>(current, size);
-        SysUserDeptBo sysUserDeptBo = new SysUserDeptBo(username, phone, deptId);
+        SysUserDeptBo sysUserDeptBo = new SysUserDeptBo(username, phone, deptId,UserTypeEnum.SYS_USER.getValue());
         IPage<SysUser> sysUserIPage = sysUserMapper.iPageSelect(page, sysUserDeptBo);
         if (StringUtils.isEmpty(sysUserIPage)) {
             return new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
@@ -69,7 +69,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
             }
             sysUser.setCreateTime(DateUtils.localDateTimeToStr(LocalDateTime.now()));
             sysUser.setDelFlag(false);
-            sysUser.setUserType(UserTypeEnum.SYS_USER.getValue().toString());
+            sysUser.setUserType(UserTypeEnum.SYS_USER.getValue());
             sysUser.setStatus(StatusEnum.YES.value().toString());
             return this.save(sysUser);
         } else {

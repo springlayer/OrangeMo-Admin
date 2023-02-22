@@ -11,4 +11,5 @@ public class SysUserDeptBo {
     private String username;
     private String phone;
     private Long deptId;
+    private String userType;
 }

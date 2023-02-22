@@ -19,9 +19,15 @@ public class SysMenuController {
     @Resource
     private SysMenuService sysMenuService;
 
-    @GetMapping("/ztree")
+    @GetMapping("/user/ztree")
     @ResponseBody
     public R<List<SysMenu>> info() {
-        return R.data(sysMenuService.menuTreeData(CurrentUserHelder.currentUser().getUserId()));
+        return R.data(sysMenuService.userMenuTreeData(CurrentUserHelder.currentUser().getUserId()));
+    }
+
+    @GetMapping("/ztree")
+    @ResponseBody
+    public R<List<SysMenu>> ztree() {
+        return R.data(sysMenuService.menuTreeData());
     }
 }

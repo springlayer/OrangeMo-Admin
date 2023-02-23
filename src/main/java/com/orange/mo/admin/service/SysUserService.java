@@ -92,6 +92,13 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     }
 
     public IPage<SysUser> querySysUserPageByUserIds(Page page, List<Long> userIds) {
-        return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).in(SysUser::getUserId, userIds));
+        return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).in(SysUser::getUserId, userIds).ne(SysUser::getUserType, UserTypeEnum.ADMIN.getValue()));
+    }
+
+    public IPage<SysUser> querySysUserPageByUnUserIds(Page page, List<Long> userIds, String username) {
+        if (ObjectUtils.isEmpty(userIds)) {
+            return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).ne(SysUser::getUserType, UserTypeEnum.ADMIN.getValue()).like(SysUser::getUserName,username));
+        }
+        return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).notIn(SysUser::getUserId, userIds).ne(SysUser::getUserType, UserTypeEnum.ADMIN.getValue()).like(SysUser::getUserName,username));
     }
 }

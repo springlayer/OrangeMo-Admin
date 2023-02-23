@@ -3,6 +3,7 @@ package com.orange.mo.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.orange.mo.admin.domain.SysRole;
 import com.orange.mo.admin.domain.SysUser;
+import com.orange.mo.admin.domain.bo.RoleUserBo;
 import com.orange.mo.admin.service.SysRoleService;
 import com.orange.mo.common.api.R;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +27,20 @@ public class SysRoleController {
         return R.data(sysRoleService.querySysUserInRoleIdPage(current, size, roleId));
     }
 
+    @GetMapping(value = "/query/page/un/user")
+    public R<IPage<SysUser>> querySysUserUnRoleIdPage(@RequestParam(value = "current", required = true, defaultValue = "1") Integer current, @RequestParam(value = "size", required = true, defaultValue = "10") Integer size, @RequestParam(value = "roleId") String roleId, @RequestParam(value = "username", required = false) String username) {
+        return R.data(sysRoleService.querySysUserUnRoleIdPage(current, size, roleId, username));
+    }
+
     @GetMapping(value = "/remove")
     public R removeSysRole(@RequestParam(value = "roleId") String roleId) {
         return R.status(sysRoleService.removeSysRole(roleId));
+    }
+
+    @PostMapping(value = "/create/acl/user")
+    @ResponseBody
+    public R createAclUserRole(@RequestBody RoleUserBo roleUserBo) {
+        return R.status(sysRoleService.createAclUserRole(roleUserBo));
     }
 
     @PostMapping(value = "/createOrUpdate")

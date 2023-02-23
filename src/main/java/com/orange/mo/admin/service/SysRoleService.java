@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.orange.mo.admin.domain.SysRole;
 import com.orange.mo.admin.domain.SysRoleMenu;
 import com.orange.mo.admin.domain.SysUser;
+import com.orange.mo.admin.domain.bo.RoleUserBo;
 import com.orange.mo.admin.enums.StatusEnum;
 import com.orange.mo.admin.mapper.SysRoleMapper;
 import com.orange.mo.exception.BusinessException;
@@ -116,5 +117,18 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
 
     public Boolean removeSysUserRoleAcl(String userId, String roleId) {
         return sysUserRoleService.removeByUserIdAndRoleId(userId, roleId);
+    }
+
+    public IPage<SysUser> querySysUserUnRoleIdPage(Integer current, Integer size, String roleId, String username) {
+        Page page = new Page(current, size);
+        List<Long> userIds = sysUserRoleService.selectSysUserIdsByRoleId(roleId);
+        return sysUserService.querySysUserPageByUnUserIds(page, userIds, username);
+    }
+
+    public Boolean createAclUserRole(RoleUserBo roleUserBo) {
+        if (ObjectUtils.isEmpty(roleUserBo.getUserId())) {
+            throw new BusinessException("用户不能为空");
+        }
+        return sysUserRoleService.createAclUserRole(roleUserBo.getUserId(), roleUserBo.getRoleId());
     }
 }

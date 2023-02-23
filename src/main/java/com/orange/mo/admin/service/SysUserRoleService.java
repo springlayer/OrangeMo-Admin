@@ -42,4 +42,12 @@ public class SysUserRoleService extends ServiceImpl<SysUserRoleMapper, SysUserRo
     public Boolean removeByUserIdAndRoleId(String userId, String roleId) {
         return this.remove(Wrappers.lambdaQuery(SysUserRole.class).eq(SysUserRole::getRoleId, roleId).eq(SysUserRole::getUserId, userId));
     }
+
+    public Boolean createAclUserRole(List<Long> userId, Long roleId) {
+        List<SysUserRole> sysUserRoles = new ArrayList<>();
+        for (Long l : userId) {
+            sysUserRoles.add(new SysUserRole(l, roleId));
+        }
+        return this.saveBatch(sysUserRoles);
+    }
 }

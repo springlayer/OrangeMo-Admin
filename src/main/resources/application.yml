@@ -1,6 +1,6 @@
 orangemo:
-  profile: /data/www/orangemo/
-#  profile: E:/orangemo/uploadPath
+#  profile: /data/www/orangemo/
+  profile: E:/orangemo/uploadPath
   ignores: /login
 server:
   port: 8080

@@ -32,6 +32,12 @@ public class SysMenu {
     private Long parentId;
 
     /**
+     * 父菜单名称
+     */
+    @TableField(exist = false)
+    private String parentName;
+
+    /**
      * 显示顺序
      */
     private String orderNum;

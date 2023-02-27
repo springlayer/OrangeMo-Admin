@@ -42,4 +42,8 @@ public class SysRoleMenuService extends ServiceImpl<SysRoleMenuMapper, SysRoleMe
                 .in(SysRoleMenu::getRoleId, roleIds));
         return list.stream().collect(Collectors.groupingBy(SysRoleMenu::getRoleId));
     }
+
+    public List<SysRoleMenu> selectSysRoleByMenuId(Long menuId) {
+        return this.list(Wrappers.lambdaQuery(SysRoleMenu.class).eq(SysRoleMenu::getMenuId, menuId));
+    }
 }

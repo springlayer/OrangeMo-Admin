@@ -1,13 +1,10 @@
 package com.counting.dolphin.admin.controller;
 
-import com.counting.dolphin.common.api.R;
-import com.counting.dolphin.common.jwt.CurrentUserHelder;
 import com.counting.dolphin.admin.domain.SysMenu;
 import com.counting.dolphin.admin.service.SysMenuService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.counting.dolphin.common.api.R;
+import com.counting.dolphin.common.jwt.CurrentUserHelder;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -29,5 +26,29 @@ public class SysMenuController {
     @ResponseBody
     public R<List<SysMenu>> ztree() {
         return R.data(sysMenuService.menuTreeData());
+    }
+
+    @GetMapping("/all/ztree")
+    @ResponseBody
+    public R<List<SysMenu>> allZtree() {
+        return R.data(sysMenuService.menuAllTreeData());
+    }
+
+    @GetMapping("/list")
+    @ResponseBody
+    public R<List<SysMenu>> list() {
+        return R.data(sysMenuService.menuListData());
+    }
+
+    @PostMapping("/createOrUpdate")
+    @ResponseBody
+    public R createOrUpdate(@RequestBody SysMenu sysMenu) {
+        return R.status(sysMenuService.createOrUpdate(sysMenu));
+    }
+
+    @GetMapping("/remove")
+    @ResponseBody
+    public R removeMenu(@RequestParam("menuId") String menuId) {
+        return R.status(sysMenuService.removeMenuByMenuId(menuId));
     }
 }

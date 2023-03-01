@@ -4,14 +4,17 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.counting.dolphin.admin.domain.SysDept;
 import com.counting.dolphin.admin.domain.bo.Ztree;
-import com.counting.dolphin.admin.mapper.SysDeptMapper;
 import com.counting.dolphin.admin.enums.StatusEnum;
+import com.counting.dolphin.admin.mapper.SysDeptMapper;
+import com.counting.dolphin.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -23,7 +26,7 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
      * @return List<Ztree>
      */
     public List<Ztree> queryDeptZtreeData() {
-        List<SysDept> deptList = this.list(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getStatus, StatusEnum.NOT.value().toString()).eq(SysDept::getDelFlag, StatusEnum.NOT.value().toString()));
+        List<SysDept> deptList = this.list(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getStatus, StatusEnum.YES.value().toString()).eq(SysDept::getDelFlag, false));
         if (ObjectUtils.isEmpty(deptList)) {
             return null;
         }
@@ -115,5 +118,82 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
             }
         }
         return tlist;
+    }
+
+    public List<SysDept> deptListData() {
+        List<SysDept> list = this.list(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDelFlag, false).orderByAsc(SysDept::getOrderNum));
+        if (StringUtils.isEmpty(list)) {
+            return new ArrayList<>();
+        }
+        List<Long> parentIds = list.stream().map(sysDept -> sysDept.getParentId()).collect(Collectors.toList());
+        List<SysDept> sysDeptList = this.list(Wrappers.lambdaQuery(SysDept.class).in(SysDept::getParentId, parentIds));
+        if (!StringUtils.isEmpty(sysDeptList)) {
+            Map<Long, SysDept> sysDeptMap = sysDeptList.stream().collect(Collectors.toMap(SysDept::getDeptId,
+                    Function.identity()));
+            for (SysDept sysDept : list) {
+                SysDept menu = sysDeptMap.get(sysDept.getParentId());
+                if (null != menu) {
+                    sysDept.setParentName(menu.getDeptName());
+                }
+            }
+        }
+        return list;
+
+    }
+
+    public Boolean removeDeptByDeptId(String deptId) {
+        List<SysDept> sysDeptList = this.list(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getParentId, Long.valueOf(deptId)).eq(SysDept::getDelFlag, false));
+        if (!ObjectUtils.isEmpty(sysDeptList)) {
+            throw new BusinessException("存在子部门，无法删除");
+        }
+        SysDept one = this.getOne(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptId, Long.valueOf(deptId)).eq(SysDept::getDelFlag, false));
+        one.setDelFlag(true);
+        return this.update(one, Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptId, Long.valueOf(deptId)));
+    }
+
+    public Boolean createOrUpdate(SysDept sysDept) {
+        if (ObjectUtils.isEmpty(sysDept.getDeptId())) {
+            SysDept dept = this.getOne(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptName, sysDept.getDeptName()).eq(SysDept::getDelFlag,false));
+            if (null != dept) {
+                throw new BusinessException("存在相同的组织名");
+            }
+            SysDept parentSysDept = this.getOne(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptId, sysDept.getParentId()));
+            sysDept.setAncestors(parentSysDept.getAncestors() + "," + sysDept.getParentId());
+            sysDept.setCreateTime(LocalDateTime.now());
+            sysDept.setStatus(StatusEnum.YES.value().toString());
+            sysDept.setDelFlag(false);
+            return this.save(sysDept);
+        } else {
+            SysDept one = this.getOne(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptName, sysDept.getDeptName()).eq(SysDept::getDelFlag,false));
+            this.updateDeptChildren(sysDept);
+            if (null != one && !one.getDeptName().equals(sysDept.getDeptName())) {
+                throw new BusinessException("存在相同的组织名");
+            }
+        }
+        return this.update(sysDept, Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptId, sysDept.getDeptId()));
+    }
+
+    /**
+     * 更新子组织
+     *
+     * @param sysDept
+     */
+    public void updateDeptChildren(SysDept sysDept) {
+        if (sysDept.getParentId() == 0) {
+            return;
+        }
+        SysDept parentSysDept = this.getOne(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptId, sysDept.getParentId()));
+        if (StringUtils.isEmpty(parentSysDept)) {
+            throw new BusinessException("父组织不存在");
+        }
+        String newAncestors = parentSysDept.getAncestors() + "," + parentSysDept.getDeptId();
+        sysDept.setAncestors(newAncestors);
+        List<SysDept> children = this.list(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptId, sysDept.getDeptId()));
+        for (SysDept child : children) {
+            child.setAncestors(child.getAncestors().replace(sysDept.getAncestors(), newAncestors));
+        }
+        if (children.size() > 0) {
+            this.updateBatchById(children);
+        }
     }
 }

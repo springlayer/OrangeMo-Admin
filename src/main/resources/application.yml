@@ -1,9 +1,10 @@
-orangemo:
-#  profile: /data/www/orangemo/
-  profile: E:/orangemo/uploadPath
-  ignores: /login
+counting:
+  dolphin:
+    #  profile: /data/www/orangemo/
+    profile: E:/orangemo/uploadPath
+    ignores: /login
 server:
-  port: 8080
+  port: 8081
 spring:
   datasource:
     druid:
@@ -42,8 +43,8 @@ spring:
         allow:
         url-pattern: /druid/*
         # 控制台管理用户名和密码
-#        login-username: roangeink
-#        login-password: momo
+      #        login-username: roangeink
+      #        login-password: momo
       filter:
         stat:
           enabled: true

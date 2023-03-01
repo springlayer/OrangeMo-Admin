@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-@ConfigurationProperties(prefix = "orangemo")
+@ConfigurationProperties(prefix = "counting.dolphin")
 public class CountingDolphinConfig {
     private static String profile;
 

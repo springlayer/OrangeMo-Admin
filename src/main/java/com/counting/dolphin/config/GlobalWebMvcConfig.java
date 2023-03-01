@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 public class GlobalWebMvcConfig implements WebMvcConfigurer {
 
     @Resource
-    private CountingDolphinConfig orangeMoConfig;
+    private CountingDolphinConfig countingDolphinConfig;
     /**
      * 重写父类提供的跨域请求处理的接口
      *
@@ -45,6 +45,6 @@ public class GlobalWebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //添加权限拦截器
-        registry.addInterceptor(new JWTInterceptor()).excludePathPatterns(orangeMoConfig.getIgnores()).excludePathPatterns("/static/**");
+        registry.addInterceptor(new JWTInterceptor()).excludePathPatterns(countingDolphinConfig.getIgnores()).excludePathPatterns("/static/**");
     }
 }

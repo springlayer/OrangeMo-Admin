@@ -3,28 +3,25 @@ package com.counting.dolphin.admin.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@TableName(value = "sys_dept")
 public class SysDept {
     /**
      * 部门ID
      */
     @TableId(type = IdType.ASSIGN_ID)
-    private Long deptId;
+    private Integer deptId;
 
     /**
      * 父部门ID
      */
-    private Long parentId;
+    private Integer parentId;
 
     @TableField(exist = false)
     private String parentName;

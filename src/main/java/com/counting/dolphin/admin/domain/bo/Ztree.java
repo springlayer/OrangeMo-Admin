@@ -6,8 +6,8 @@ import java.util.List;
 
 @Data
 public class Ztree {
-    private Long id;
+    private Integer id;
     private String text;
-    private Long parentId;
+    private Integer parentId;
     private List<Ztree> children;
 }

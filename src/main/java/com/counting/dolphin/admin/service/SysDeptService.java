@@ -26,7 +26,7 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
      * @return List<Ztree>
      */
     public List<Ztree> queryDeptZtreeData() {
-        List<SysDept> deptList = this.list(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getStatus, StatusEnum.YES.value().toString()).eq(SysDept::getDelFlag, false));
+        List<SysDept> deptList = this.list(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getStatus, StatusEnum.YES.value().toString()).eq(SysDept::getDelFlag, false).orderByAsc(SysDept::getOrderNum));
         if (ObjectUtils.isEmpty(deptList)) {
             return null;
         }
@@ -125,10 +125,10 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
         if (StringUtils.isEmpty(list)) {
             return new ArrayList<>();
         }
-        List<Long> parentIds = list.stream().map(sysDept -> sysDept.getParentId()).collect(Collectors.toList());
+        List<Integer> parentIds = list.stream().map(sysDept -> sysDept.getParentId()).collect(Collectors.toList());
         List<SysDept> sysDeptList = this.list(Wrappers.lambdaQuery(SysDept.class).in(SysDept::getParentId, parentIds));
         if (!StringUtils.isEmpty(sysDeptList)) {
-            Map<Long, SysDept> sysDeptMap = sysDeptList.stream().collect(Collectors.toMap(SysDept::getDeptId,
+            Map<Integer, SysDept> sysDeptMap = sysDeptList.stream().collect(Collectors.toMap(SysDept::getDeptId,
                     Function.identity()));
             for (SysDept sysDept : list) {
                 SysDept menu = sysDeptMap.get(sysDept.getParentId());
@@ -187,10 +187,12 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
             throw new BusinessException("父组织不存在");
         }
         String newAncestors = parentSysDept.getAncestors() + "," + parentSysDept.getDeptId();
+        SysDept byId = this.getById(sysDept.getDeptId());
+        String oldAncestors = byId.getAncestors();
         sysDept.setAncestors(newAncestors);
-        List<SysDept> children = this.list(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptId, sysDept.getDeptId()));
+        List<SysDept> children = this.list(Wrappers.lambdaQuery(SysDept.class).apply(sysDept.getDeptId() != null,"FIND_IN_SET('"+sysDept.getDeptId()+"',ancestors)"));
         for (SysDept child : children) {
-            child.setAncestors(child.getAncestors().replace(sysDept.getAncestors(), newAncestors));
+            child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }
         if (children.size() > 0) {
             this.updateBatchById(children);

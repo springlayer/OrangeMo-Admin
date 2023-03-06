@@ -4,11 +4,11 @@ counting:
     profile: E:/orangemo/uploadPath
     ignores: /login
 server:
-  port: 8081
-#开启sql日志
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  port: 8080
+##开启sql日志
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 spring:
   datasource:
     druid:

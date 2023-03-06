@@ -15,7 +15,7 @@ public class SysDept {
     /**
      * 部门ID
      */
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Integer deptId;
 
     /**

@@ -12,7 +12,10 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -72,13 +75,6 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
         return ztree;
     }
 
-    private static List<Ztree> convertToZtrees(List<SysDept> sysDeptList) {
-        List<Ztree> ztreeList = new ArrayList<>();
-        for (SysDept sysDept : sysDeptList) {
-            ztreeList.add(convertToZtree(sysDept));
-        }
-        return ztreeList;
-    }
 
     /**
      * 递归列表
@@ -153,7 +149,7 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
 
     public Boolean createOrUpdate(SysDept sysDept) {
         if (ObjectUtils.isEmpty(sysDept.getDeptId())) {
-            SysDept dept = this.getOne(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptName, sysDept.getDeptName()).eq(SysDept::getDelFlag,false));
+            SysDept dept = this.getOne(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptName, sysDept.getDeptName()).eq(SysDept::getDelFlag, false));
             if (null != dept) {
                 throw new BusinessException("存在相同的组织名");
             }
@@ -164,7 +160,7 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
             sysDept.setDelFlag(false);
             return this.save(sysDept);
         } else {
-            SysDept one = this.getOne(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptName, sysDept.getDeptName()).eq(SysDept::getDelFlag,false));
+            SysDept one = this.getOne(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptName, sysDept.getDeptName()).eq(SysDept::getDelFlag, false));
             this.updateDeptChildren(sysDept);
             if (null != one && !one.getDeptName().equals(sysDept.getDeptName())) {
                 throw new BusinessException("存在相同的组织名");
@@ -190,12 +186,18 @@ public class SysDeptService extends ServiceImpl<SysDeptMapper, SysDept> {
         SysDept byId = this.getById(sysDept.getDeptId());
         String oldAncestors = byId.getAncestors();
         sysDept.setAncestors(newAncestors);
-        List<SysDept> children = this.list(Wrappers.lambdaQuery(SysDept.class).apply(sysDept.getDeptId() != null,"FIND_IN_SET('"+sysDept.getDeptId()+"',ancestors)"));
+        List<SysDept> children = this.list(Wrappers.lambdaQuery(SysDept.class).apply(sysDept.getDeptId() != null, "FIND_IN_SET('" + sysDept.getDeptId() + "',ancestors)"));
         for (SysDept child : children) {
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }
         if (children.size() > 0) {
             this.updateBatchById(children);
         }
+    }
+
+    public Boolean modifyStatus(String deptId, String status) {
+        SysDept one = this.getOne(Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptId, Long.valueOf(deptId)));
+        one.setStatus(status);
+        return this.update(one, Wrappers.lambdaQuery(SysDept.class).eq(SysDept::getDeptId, one.getDeptId()));
     }
 }

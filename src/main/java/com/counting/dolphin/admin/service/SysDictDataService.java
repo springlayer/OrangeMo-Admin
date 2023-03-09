@@ -44,4 +44,9 @@ public class SysDictDataService extends ServiceImpl<SysDictDataMapper, SysDictDa
         return this.remove(Wrappers.lambdaQuery(SysDictData.class).eq(SysDictData::getDictCode, dictCode));
     }
 
+    public Boolean modifyStatus(String dictCode, String status) {
+        SysDictData one = this.getOne(Wrappers.lambdaQuery(SysDictData.class).eq(SysDictData::getDictCode, Long.valueOf(dictCode)));
+        one.setStatus(Integer.valueOf(status));
+        return this.update(one, Wrappers.lambdaQuery(SysDictData.class).eq(SysDictData::getDictCode, one.getDictCode()));
+    }
 }

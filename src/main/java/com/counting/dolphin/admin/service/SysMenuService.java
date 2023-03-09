@@ -37,7 +37,7 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
     }
 
     public List<SysMenu> menuTreeData() {
-        List<SysMenu> menuList = this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuType, MenuTypeEnum.addMandC()).orderByAsc(SysMenu::getOrderNum));
+        List<SysMenu> menuList = this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuType, MenuTypeEnum.addMandC()).orderByAsc(SysMenu::getOrderNum).eq(SysMenu::getVisible, StatusEnum.YES.value().toString()));
         return menuList.stream()
                 .filter(m -> m.getParentId() == 0)
                 .peek(m -> m.setChildren(getChildren(m, menuList)))
@@ -45,7 +45,7 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
     }
 
     public List<SysMenu> menuAllTreeData() {
-        List<SysMenu> menuList = this.list(Wrappers.lambdaQuery(SysMenu.class).orderByAsc(SysMenu::getOrderNum));
+        List<SysMenu> menuList = this.list(Wrappers.lambdaQuery(SysMenu.class).orderByAsc(SysMenu::getOrderNum).eq(SysMenu::getVisible, StatusEnum.YES.value().toString()));
         return menuList.stream()
                 .filter(m -> m.getParentId() == 0)
                 .peek(m -> m.setChildren(getChildren(m, menuList)))
@@ -62,7 +62,7 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
     public List<SysMenu> selectMenuAll(Long userId) {
         List<SysMenu> menuList = null;
         if (SysUser.isAdmin(userId)) {
-            menuList = this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuType, MenuTypeEnum.addMandC()).orderByAsc(SysMenu::getOrderNum));
+            menuList = this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuType, MenuTypeEnum.addMandC()).orderByAsc(SysMenu::getOrderNum).eq(SysMenu::getVisible, StatusEnum.YES.value().toString()));
         } else {
             menuList = this.selectMenuAllByUserId(userId);
         }
@@ -72,7 +72,7 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
     private List<SysMenu> selectMenuAllByUserId(Long userId) {
         List<Long> roles = sysUserRoleService.getUserMenuTreeData(userId);
         List<Long> menuIds = sysRoleMenuService.getMenuIdsByRoles(roles);
-        return this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuId, menuIds).in(SysMenu::getMenuType, MenuTypeEnum.addMandC()));
+        return this.list(Wrappers.lambdaQuery(SysMenu.class).in(SysMenu::getMenuId, menuIds).in(SysMenu::getMenuType, MenuTypeEnum.addMandC()).eq(SysMenu::getVisible, StatusEnum.YES.value().toString()));
     }
 
     public List<SysMenu> menuListData() {
@@ -126,5 +126,11 @@ public class SysMenuService extends ServiceImpl<SysMenuMapper, SysMenu> {
             throw new BusinessException("存在子菜单无法删除");
         }
         return this.remove(Wrappers.lambdaQuery(SysMenu.class).eq(SysMenu::getMenuId, Long.valueOf(menuId)));
+    }
+
+    public Boolean modifyStatus(String menuId, String status) {
+        SysMenu one = this.getOne(Wrappers.lambdaQuery(SysMenu.class).eq(SysMenu::getMenuId, Long.valueOf(menuId)));
+        one.setVisible(status);
+        return this.update(one, Wrappers.lambdaQuery(SysMenu.class).eq(SysMenu::getMenuId, one.getMenuId()));
     }
 }

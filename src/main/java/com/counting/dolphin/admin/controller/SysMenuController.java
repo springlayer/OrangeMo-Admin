@@ -56,4 +56,10 @@ public class SysMenuController {
     public R removeMenu(@RequestParam("menuId") String menuId) {
         return R.status(sysMenuService.removeMenuByMenuId(menuId));
     }
+
+    @ApiLog(title = "菜单状态", businessType = BusinessType.UPDATE, operatorType = OperatorType.MANAGE)
+    @GetMapping(value = "/modify/status")
+    public R modifyStatus(@RequestParam(value = "menuId") String menuId, @RequestParam(value = "status") String status) {
+        return R.data(sysMenuService.modifyStatus(menuId, status));
+    }
 }

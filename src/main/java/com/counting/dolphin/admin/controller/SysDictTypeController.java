@@ -36,4 +36,10 @@ public class SysDictTypeController {
     public R removeSysDictType(@RequestParam(value = "dictId") String dictId) {
         return R.status(sysDictTypeService.removeSysDictType(dictId));
     }
+
+    @ApiLog(title = "字典类型状态", businessType = BusinessType.UPDATE, operatorType = OperatorType.MANAGE)
+    @GetMapping(value = "/modify/status")
+    public R modifyStatus(@RequestParam(value = "dictId") String dictId, @RequestParam(value = "status") String status) {
+        return R.data(sysDictTypeService.modifyStatus(dictId, status));
+    }
 }

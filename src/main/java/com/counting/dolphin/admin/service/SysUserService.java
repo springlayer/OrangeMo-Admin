@@ -4,15 +4,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.counting.dolphin.admin.domain.bo.ReSetPwd;
-import com.counting.dolphin.admin.mapper.SysUserMapper;
-import com.counting.dolphin.exception.BusinessException;
-import com.counting.dolphin.admin.constant.ComConstant;
 import com.counting.dolphin.admin.domain.SysDept;
 import com.counting.dolphin.admin.domain.SysUser;
+import com.counting.dolphin.admin.domain.bo.ReSetPwd;
 import com.counting.dolphin.admin.domain.bo.SysUserDeptBo;
 import com.counting.dolphin.admin.enums.StatusEnum;
 import com.counting.dolphin.admin.enums.UserTypeEnum;
+import com.counting.dolphin.admin.mapper.SysUserMapper;
+import com.counting.dolphin.exception.BusinessException;
 import com.counting.dolphin.utils.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -32,7 +31,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     private SysDeptService sysDeptService;
 
     public SysUser login(SysUser user) {
-        return this.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getLoginName, user.getLoginName()).eq(SysUser::getPassword, user.getPassword()).eq(SysUser::getStatus, ComConstant.Enable));
+        return this.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getLoginName, user.getLoginName()).eq(SysUser::getPassword, user.getPassword()).eq(SysUser::getDelFlag, true));
     }
 
     public IPage<SysUser> querySysUserPage(Integer current, Integer size, String username, String phone, Long deptId) {
@@ -71,7 +70,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
             sysUser.setCreateTime(DateUtils.localDateTimeToStr(LocalDateTime.now()));
             sysUser.setDelFlag(false);
             sysUser.setUserType(UserTypeEnum.SYS_USER.getValue());
-            sysUser.setStatus(StatusEnum.YES.value().toString());
+            sysUser.setStatus(StatusEnum.NOT.value().toString());
             return this.save(sysUser);
         } else {
             SysUser one = this.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getPhone, sysUser.getPhone()).eq(SysUser::getDelFlag, false));
@@ -92,13 +91,19 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     }
 
     public IPage<SysUser> querySysUserPageByUserIds(Page page, List<Long> userIds) {
-        return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).in(SysUser::getUserId, userIds).ne(SysUser::getUserType, UserTypeEnum.ADMIN.getValue()));
+        return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).in(SysUser::getUserId, userIds).ne(SysUser::getUserType, UserTypeEnum.ADMIN.getValue()).eq(SysUser::getStatus,StatusEnum.YES.value().toString()));
     }
 
     public IPage<SysUser> querySysUserPageByUnUserIds(Page page, List<Long> userIds, String username) {
         if (ObjectUtils.isEmpty(userIds)) {
-            return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).ne(SysUser::getUserType, UserTypeEnum.ADMIN.getValue()).like(SysUser::getUserName,username));
+            return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).ne(SysUser::getUserType, UserTypeEnum.ADMIN.getValue()).like(SysUser::getUserName, username).eq(SysUser::getStatus,StatusEnum.YES.value().toString()));
         }
-        return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).notIn(SysUser::getUserId, userIds).ne(SysUser::getUserType, UserTypeEnum.ADMIN.getValue()).like(SysUser::getUserName,username));
+        return sysUserMapper.selectPage(page, Wrappers.<SysUser>lambdaQuery().eq(SysUser::getDelFlag, false).notIn(SysUser::getUserId, userIds).ne(SysUser::getUserType, UserTypeEnum.ADMIN.getValue()).like(SysUser::getUserName, username).eq(SysUser::getStatus,StatusEnum.YES.value().toString()));
+    }
+
+    public Boolean modifyUserStatus(String userId, String status) {
+        SysUser one = this.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getUserId, Long.valueOf(userId)));
+        one.setStatus(status);
+        return this.update(one, Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getUserId, one.getUserId()));
     }
 }

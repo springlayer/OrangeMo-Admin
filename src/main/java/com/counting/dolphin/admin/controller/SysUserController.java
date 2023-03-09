@@ -54,4 +54,9 @@ public class SysUserController {
     public R<SysUser> sysUserDetail(@RequestParam(value = "userId") String userId) {
         return R.data(sysUserService.sysUserDetail(userId));
     }
+    @ApiLog(title = "用户状态", businessType = BusinessType.UPDATE, operatorType = OperatorType.MANAGE)
+    @GetMapping(value = "/modify/status")
+    public R modifyUserStatus(@RequestParam(value = "userId") String userId, @RequestParam(value = "status") String status) {
+        return R.data(sysUserService.modifyUserStatus(userId, status));
+    }
 }

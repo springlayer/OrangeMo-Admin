@@ -44,4 +44,10 @@ public class SysDeptController {
     public R removeDept(@RequestParam("deptId") String deptId) {
         return R.status(sysDeptService.removeDeptByDeptId(deptId));
     }
+
+    @ApiLog(title = "部门状态", businessType = BusinessType.UPDATE, operatorType = OperatorType.MANAGE)
+    @GetMapping(value = "/modify/status")
+    public R modifyStatus(@RequestParam(value = "deptId") String deptId, @RequestParam(value = "status") String status) {
+        return R.data(sysDeptService.modifyStatus(deptId, status));
+    }
 }

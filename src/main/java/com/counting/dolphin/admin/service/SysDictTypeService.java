@@ -54,4 +54,10 @@ public class SysDictTypeService extends ServiceImpl<SysDictTypeMapper, SysDictTy
         }
         return this.update(sysDictType, Wrappers.lambdaQuery(SysDictType.class).eq(SysDictType::getDictId, sysDictType.getDictId()));
     }
+
+    public Boolean modifyStatus(String dictId, String status) {
+        SysDictType one = this.getOne(Wrappers.lambdaQuery(SysDictType.class).eq(SysDictType::getDictId, Long.valueOf(dictId)));
+        one.setStatus(Integer.valueOf(status));
+        return this.update(one, Wrappers.lambdaQuery(SysDictType.class).eq(SysDictType::getDictId, one.getDictId()));
+    }
 }

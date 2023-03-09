@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.counting.dolphin.admin.domain.SysRole;
 import com.counting.dolphin.admin.domain.SysUser;
 import com.counting.dolphin.admin.domain.bo.RoleUserBo;
-import com.counting.dolphin.common.api.R;
 import com.counting.dolphin.admin.service.SysRoleService;
+import com.counting.dolphin.common.api.R;
 import com.counting.dolphin.constant.ApiLog;
 import com.counting.dolphin.constant.BusinessType;
 import com.counting.dolphin.constant.OperatorType;
@@ -70,5 +70,11 @@ public class SysRoleController {
     @GetMapping(value = "/remove/user")
     public R removeSysUserRoleAcl(@RequestParam("userId") String userId, @RequestParam("roleId") String roleId) {
         return R.status(sysRoleService.removeSysUserRoleAcl(userId, roleId));
+    }
+
+    @ApiLog(title = "角色状态", businessType = BusinessType.UPDATE, operatorType = OperatorType.MANAGE)
+    @GetMapping(value = "/modify/status")
+    public R modifyRoleStatus(@RequestParam(value = "roleId") String roleId, @RequestParam(value = "status") String status) {
+        return R.data(sysRoleService.modifyRoleStatus(roleId, status));
     }
 }

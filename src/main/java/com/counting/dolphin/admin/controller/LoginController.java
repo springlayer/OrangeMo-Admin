@@ -34,7 +34,7 @@ public class LoginController {
      * @return
      */
     @PostMapping("/login")
-    public R login(@RequestBody SysUser sysUser, HttpServletRequest request) {
+    public R login(@RequestBody SysUser sysUser) {
         if (StringUtils.isEmpty(sysUser.getLoginName())) {
             throw new BusinessException("用户名不能为空");
         }
@@ -43,6 +43,10 @@ public class LoginController {
         }
         SysUser result = sysUserService.login(sysUser);
         if (result != null) {
+            if(StatusEnum.value(Integer.valueOf(result.getStatus())).isNo()){
+                AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getLoginName(), "账号被禁用", StatusEnum.NOT.value()));
+                throw new BusinessException("账号被禁用");
+            }
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getLoginName(), "登录成功", StatusEnum.YES.value()));
             return R.data(JwtTokenUtil.createToken(result));
         } else {

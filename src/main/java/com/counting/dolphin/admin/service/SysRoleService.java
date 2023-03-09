@@ -5,13 +5,13 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.counting.dolphin.admin.domain.SysRole;
+import com.counting.dolphin.admin.domain.SysRoleMenu;
 import com.counting.dolphin.admin.domain.SysUser;
 import com.counting.dolphin.admin.domain.bo.RoleUserBo;
+import com.counting.dolphin.admin.enums.StatusEnum;
 import com.counting.dolphin.admin.mapper.SysRoleMapper;
 import com.counting.dolphin.exception.BusinessException;
 import com.counting.dolphin.utils.DateUtils;
-import com.counting.dolphin.admin.domain.SysRoleMenu;
-import com.counting.dolphin.admin.enums.StatusEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -130,5 +130,11 @@ public class SysRoleService extends ServiceImpl<SysRoleMapper, SysRole> {
             throw new BusinessException("用户不能为空");
         }
         return sysUserRoleService.createAclUserRole(roleUserBo.getUserId(), roleUserBo.getRoleId());
+    }
+
+    public Boolean modifyRoleStatus(String roleId, String status) {
+        SysRole one = this.getOne(Wrappers.lambdaQuery(SysRole.class).eq(SysRole::getRoleId, Long.valueOf(roleId)));
+        one.setStatus(status);
+        return this.update(one, Wrappers.lambdaQuery(SysRole.class).eq(SysRole::getRoleId, one.getRoleId()));
     }
 }

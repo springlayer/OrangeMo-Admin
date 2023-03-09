@@ -31,7 +31,7 @@ public class SysUserService extends ServiceImpl<SysUserMapper, SysUser> {
     private SysDeptService sysDeptService;
 
     public SysUser login(SysUser user) {
-        return this.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getLoginName, user.getLoginName()).eq(SysUser::getPassword, user.getPassword()).eq(SysUser::getDelFlag, true));
+        return this.getOne(Wrappers.lambdaQuery(SysUser.class).eq(SysUser::getLoginName, user.getLoginName()).eq(SysUser::getPassword, user.getPassword()).eq(SysUser::getDelFlag, false));
     }
 
     public IPage<SysUser> querySysUserPage(Integer current, Integer size, String username, String phone, Long deptId) {

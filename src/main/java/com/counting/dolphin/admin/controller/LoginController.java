@@ -1,18 +1,25 @@
 package com.counting.dolphin.admin.controller;
 
-import com.counting.dolphin.admin.domain.bo.ReSetPwd;
-import com.counting.dolphin.common.jwt.CurrentUserHelder;
-import com.counting.dolphin.exception.BusinessException;
-import com.counting.dolphin.utils.JwtTokenUtil;
 import com.counting.dolphin.admin.domain.SysUser;
+import com.counting.dolphin.admin.domain.bo.ReSetPwd;
+import com.counting.dolphin.admin.enums.StatusEnum;
 import com.counting.dolphin.admin.service.SysUserService;
 import com.counting.dolphin.common.api.R;
+import com.counting.dolphin.common.jwt.CurrentUserHelder;
+import com.counting.dolphin.config.AsyncFactory;
+import com.counting.dolphin.config.AsyncManager;
+import com.counting.dolphin.constant.ApiLog;
+import com.counting.dolphin.constant.BusinessType;
+import com.counting.dolphin.constant.OperatorType;
+import com.counting.dolphin.exception.BusinessException;
+import com.counting.dolphin.utils.JwtTokenUtil;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 
 @RestController
@@ -27,7 +34,7 @@ public class LoginController {
      * @return
      */
     @PostMapping("/login")
-    public R login(@RequestBody SysUser sysUser) {
+    public R login(@RequestBody SysUser sysUser, HttpServletRequest request) {
         if (StringUtils.isEmpty(sysUser.getLoginName())) {
             throw new BusinessException("用户名不能为空");
         }
@@ -36,17 +43,20 @@ public class LoginController {
         }
         SysUser result = sysUserService.login(sysUser);
         if (result != null) {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getLoginName(), "登录成功", StatusEnum.YES.value()));
             return R.data(JwtTokenUtil.createToken(result));
         } else {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(sysUser.getLoginName(), "账号或密码错误", StatusEnum.NOT.value()));
             throw new BusinessException("账号或密码错误");
         }
     }
 
     /**
-     * 用户登录
+     * 重置密码
      *
      * @return
      */
+    @ApiLog(title = "重置密码", businessType = BusinessType.UPDATE, operatorType = OperatorType.MANAGE)
     @PostMapping("/user/reSetPwd")
     public R reSetPwd(@RequestBody ReSetPwd reSetPwd) {
         if (StringUtils.isEmpty(reSetPwd.getOldPassword())) {

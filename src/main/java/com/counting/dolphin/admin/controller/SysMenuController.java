@@ -4,6 +4,9 @@ import com.counting.dolphin.admin.domain.SysMenu;
 import com.counting.dolphin.admin.service.SysMenuService;
 import com.counting.dolphin.common.api.R;
 import com.counting.dolphin.common.jwt.CurrentUserHelder;
+import com.counting.dolphin.constant.ApiLog;
+import com.counting.dolphin.constant.BusinessType;
+import com.counting.dolphin.constant.OperatorType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -40,12 +43,14 @@ public class SysMenuController {
         return R.data(sysMenuService.menuListData());
     }
 
+    @ApiLog(title = "菜单管理", businessType = BusinessType.INSERT, operatorType = OperatorType.MANAGE)
     @PostMapping("/createOrUpdate")
     @ResponseBody
     public R createOrUpdate(@RequestBody SysMenu sysMenu) {
         return R.status(sysMenuService.createOrUpdate(sysMenu));
     }
 
+    @ApiLog(title = "菜单管理", businessType = BusinessType.DELETE, operatorType = OperatorType.MANAGE)
     @GetMapping("/remove")
     @ResponseBody
     public R removeMenu(@RequestParam("menuId") String menuId) {

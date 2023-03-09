@@ -20,6 +20,6 @@ public class SysOperateLogService extends ServiceImpl<SysOperateLogMapper, SysOp
     public IPage<SysOperateLog> querySysOperateLogPage(Integer current, Integer size, String title) {
         Page page = new Page(current, size);
         return sysOperateLogMapper.selectPage(page, Wrappers.<SysOperateLog>lambdaQuery()
-                .like(!ObjectUtils.isEmpty(title), SysOperateLog::getTitle, title));
+                .like(!ObjectUtils.isEmpty(title), SysOperateLog::getTitle, title).orderByDesc(SysOperateLog::getOperateTime));
     }
 }

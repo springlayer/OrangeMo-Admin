@@ -20,6 +20,6 @@ public class SysLoginLogService extends ServiceImpl<SysLoginLogMapper, SysLoginL
     public IPage<SysLoginLog> querySysLoginLogPage(Integer current, Integer size, String loginName) {
         Page page = new Page(current, size);
         return sysLoginLogMapper.selectPage(page, Wrappers.<SysLoginLog>lambdaQuery()
-                .like(!ObjectUtils.isEmpty(loginName), SysLoginLog::getLoginName, loginName));
+                .like(!ObjectUtils.isEmpty(loginName), SysLoginLog::getLoginName, loginName).orderByDesc(SysLoginLog::getLoginTime));
     }
 }
